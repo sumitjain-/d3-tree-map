@@ -1,2 +1,9 @@
 # d3-tree-map
-Created with CodeSandbox
+
+Simple Treemap component to use in a React project (or anywhere with ReactDOM.render)
+
+## TODO
+
+- resize handler
+- tooltips
+- click/focus handlers
