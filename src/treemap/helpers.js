@@ -40,11 +40,15 @@ export function populateRectDimensions({ data, chartHeight, chartWidth }) {
 }
 
 export function drawRects({ svg, ref, dataArray, colorScale }) {
-  ref.current = svg
-    .selectAll("rect")
-    .data(dataArray)
-    .enter()
-    .append("rect")
+  if (!ref.current) {
+    const selection = svg
+      .selectAll("rect")
+      .data(dataArray)
+      .enter()
+      .append("rect");
+    ref.current = selection;
+  }
+  ref.current
     .attr("stroke", "#fff")
     .attr("x", d => d.x)
     .attr("y", d => d.y)
@@ -54,11 +58,14 @@ export function drawRects({ svg, ref, dataArray, colorScale }) {
 }
 
 export function drawTexts({ svg, ref, dataArray }) {
-  ref.current = svg
-    .selectAll("text")
-    .data(dataArray)
-    .enter()
-    .append("text")
+  if (!ref.current) {
+    ref.current = svg
+      .selectAll("text")
+      .data(dataArray)
+      .enter()
+      .append("text");
+  }
+  ref.current
     .attr("pointer-events", "none")
     .attr("text-anchor", "middle")
     .attr("stroke", "none")
@@ -75,7 +82,8 @@ export function addMouseHandlers({
   colorRange,
   colorScale,
   onMouseEnter,
-  onMouseLeave
+  onMouseLeave,
+  onRegionClick
 }) {
   rects.on("mouseenter", function(d, idx, items) {
     rects
@@ -102,6 +110,12 @@ export function addMouseHandlers({
 
     if (typeof onMouseLeave === "function") {
       onMouseLeave(d, rects);
+    }
+  });
+
+  rects.on("click", function(d, idx, items) {
+    if (typeof onRegionClick === "function") {
+      onRegionClick(d, rects);
     }
   });
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import {
   populateAlloc,
@@ -9,7 +9,9 @@ import {
 } from "./helpers";
 
 export function Treemap(props) {
-  const { chartWidth, chartHeight, data } = props;
+  const { chartWidth: cw, chartHeight: ch, data, responsive = true } = props;
+  const [chartWidth, setChartWidth] = useState(cw);
+  const containerRef = useRef(null);
   const mapRef = useRef(null);
   const rectsRef = useRef(null);
   const textsRef = useRef(null);
@@ -22,14 +24,40 @@ export function Treemap(props) {
     .domain(d3.extent(data, d => d.value))
     .range(colorRange);
 
+  function resizeHandler() {
+    const rect = containerRef.current.getBoundingClientRect();
+    setChartWidth(rect.width);
+  }
+
+  useEffect(() => {
+    if (!cw && responsive) {
+      window.addEventListener("resize", resizeHandler);
+      return () => {
+        window.removeEventListener("resize", resizeHandler);
+      };
+    }
+  }, [cw, responsive]);
+
+  useEffect(() => {
+    if (!(cw || chartWidth)) {
+      if (containerRef.current) {
+        resizeHandler();
+      }
+    }
+  }, [cw, chartWidth]);
+
   useEffect(() => {
     data.sort((a, b) => (a.value <= b.value ? 1 : -1));
 
     populateAlloc(data);
 
-    populateRectDimensions({ data, chartHeight, chartWidth });
+    populateRectDimensions({
+      data,
+      chartHeight: ch,
+      chartWidth: chartWidth
+    });
 
-    const svg = d3.select("svg");
+    const svg = d3.select(mapRef.current);
 
     drawRects({
       svg,
@@ -49,16 +77,20 @@ export function Treemap(props) {
     });
 
     return () => {
-      console.log("cleanup");
+      // console.log("cleanup");
     };
   }, [
     chartWidth,
-    chartHeight,
+    ch,
     props.colorRange,
     data,
     paletteScale,
     props.onMouseEnter,
     props.onMouseLeave
   ]);
-  return <svg ref={mapRef} width={chartWidth} height={chartHeight} />;
+  return (
+    <div className="map-container" ref={containerRef}>
+      <svg ref={mapRef} width={chartWidth} height={ch} />
+    </div>
+  );
 }
