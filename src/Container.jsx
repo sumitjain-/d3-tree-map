@@ -12,17 +12,12 @@ export function Container() {
         // chartWidth={400}
         chartHeight={400}
         data={data}
-        labelTemplates={[
-          function(d) {
-            return `Block: ${d.label}`;
-          },
-          function(d) {
-            return `${d.value}`;
-          },
-          function(d) {
-            return `${d.label}`;
-          }
-        ]}
+        labelTemplate={function(d) {
+          return `Block: ${d.label}`;
+        }}
+        subLabelTemplate={function(d) {
+          return `Rs.${d.value}`;
+        }}
       />
       <h2>Responsive Map</h2>
       <Treemap
