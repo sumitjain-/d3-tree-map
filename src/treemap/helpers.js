@@ -9,7 +9,12 @@ export function populateAlloc(baseData) {
   });
 }
 
-export function populateRectDimensions({ data, chartHeight, chartWidth }) {
+export function populateRectDimensions({
+  data,
+  chartHeight,
+  chartWidth,
+  splitVertical = false
+}) {
   let ptr = 0;
   let ox = 0;
   let oy = 0;
@@ -17,19 +22,19 @@ export function populateRectDimensions({ data, chartHeight, chartWidth }) {
 
   while (ptr < data.length) {
     const dim = {};
-    if (!(ptr % 2)) {
-      dim.x = ox;
-      dim.y = oy;
-      dim.width = (chartWidth - ox) * (data[ptr].alloc / allocLeft);
-      dim.height = chartHeight - oy;
-      ox = ox + dim.width;
-      allocLeft = allocLeft - data[ptr].alloc;
-    } else {
+    if (!((ptr + (splitVertical ? 1 : 0)) % 2)) {
       dim.x = ox;
       dim.y = oy;
       dim.width = chartWidth - ox;
       dim.height = (chartHeight - oy) * (data[ptr].alloc / allocLeft);
       oy = oy + dim.height;
+      allocLeft = allocLeft - data[ptr].alloc;
+    } else {
+      dim.x = ox;
+      dim.y = oy;
+      dim.width = (chartWidth - ox) * (data[ptr].alloc / allocLeft);
+      dim.height = chartHeight - oy;
+      ox = ox + dim.width;
       allocLeft = allocLeft - data[ptr].alloc;
     }
     Object.assign(data[ptr], dim);

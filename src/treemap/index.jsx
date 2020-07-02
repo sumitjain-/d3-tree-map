@@ -9,20 +9,27 @@ import {
 } from "./helpers";
 
 export function Treemap(props) {
-  const { chartWidth: cw, chartHeight: ch, data, responsive = true } = props;
+  const {
+    chartWidth: cw,
+    chartHeight: ch,
+    data,
+    responsive = true,
+    colorRange = ["#fde2ce", "#f7a05f"],
+    splitVertical
+  } = props;
   const [chartWidth, setChartWidth] = useState(cw);
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const rectsRef = useRef(null);
   const textsRef = useRef(null);
 
-  const colorRange = props.colorRange.map(x => d3.rgb(x));
+  const d3colorRange = colorRange.map(x => d3.rgb(x));
 
   const paletteScale = d3
     .scaleLinear()
     .interpolate(d3.interpolateHcl)
     .domain(d3.extent(data, d => d.value))
-    .range(colorRange);
+    .range(d3colorRange);
 
   function resizeHandler() {
     const rect = containerRef.current.getBoundingClientRect();
@@ -54,7 +61,8 @@ export function Treemap(props) {
     populateRectDimensions({
       data,
       chartHeight: ch,
-      chartWidth: chartWidth
+      chartWidth: chartWidth,
+      splitVertical
     });
 
     const svg = d3.select(mapRef.current);
@@ -70,7 +78,7 @@ export function Treemap(props) {
 
     addMouseHandlers({
       rects: rectsRef.current,
-      colorRange: props.colorRange,
+      colorRange,
       colorScale: paletteScale,
       mouseEnterHandler: props.onMouseEnter,
       mouseLeaveHandler: props.onMouseLeave
@@ -82,11 +90,12 @@ export function Treemap(props) {
   }, [
     chartWidth,
     ch,
-    props.colorRange,
+    colorRange,
     data,
     paletteScale,
     props.onMouseEnter,
-    props.onMouseLeave
+    props.onMouseLeave,
+    splitVertical
   ]);
   return (
     <div className="map-container" ref={containerRef}>
