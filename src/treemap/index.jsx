@@ -15,12 +15,16 @@ export function Treemap(props) {
     data,
     responsive = true,
     colorRange = ["#fde2ce", "#f7a05f"],
-    splitVertical
+    splitVertical,
+    labelTemplates = []
   } = props;
   const [chartWidth, setChartWidth] = useState(cw);
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const rectsRef = useRef(null);
+  const tspansRef = labelTemplates.length
+    ? labelTemplates.map(() => useRef(null))
+    : [useRef(null)];
   const textsRef = useRef(null);
 
   const d3colorRange = colorRange.map(x => d3.rgb(x));
@@ -74,7 +78,13 @@ export function Treemap(props) {
       colorScale: paletteScale
     });
 
-    drawTexts({ svg, ref: textsRef, dataArray: data });
+    drawTexts({
+      svg,
+      ref: textsRef,
+      dataArray: data,
+      tspans: tspansRef,
+      labelTemplates
+    });
 
     addMouseHandlers({
       rects: rectsRef.current,
@@ -95,7 +105,9 @@ export function Treemap(props) {
     paletteScale,
     props.onMouseEnter,
     props.onMouseLeave,
-    splitVertical
+    splitVertical,
+    tspansRef,
+    labelTemplates
   ]);
   return (
     <div className="map-container" ref={containerRef}>

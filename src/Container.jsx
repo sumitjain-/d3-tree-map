@@ -2,9 +2,28 @@ import React from "react";
 import { Treemap } from "./treemap";
 import data from "./data";
 
+import "bootstrap/dist/css/bootstrap.min.css";
+
 export function Container() {
   return (
     <div>
+      <h2>Custom Label Template</h2>
+      <Treemap
+        // chartWidth={400}
+        chartHeight={400}
+        data={data}
+        labelTemplates={[
+          function(d) {
+            return `Block: ${d.label}`;
+          },
+          function(d) {
+            return `${d.value}`;
+          },
+          function(d) {
+            return `${d.label}`;
+          }
+        ]}
+      />
       <h2>Responsive Map</h2>
       <Treemap
         // chartWidth={400}

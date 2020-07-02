@@ -62,7 +62,7 @@ export function drawRects({ svg, ref, dataArray, colorScale }) {
     .attr("fill", d => colorScale(d.value));
 }
 
-export function drawTexts({ svg, ref, dataArray }) {
+export function drawTexts({ svg, ref, dataArray, tspans, labelTemplates }) {
   if (!ref.current) {
     ref.current = svg
       .selectAll("text")
@@ -70,16 +70,30 @@ export function drawTexts({ svg, ref, dataArray }) {
       .enter()
       .append("text");
   }
+  for (let r of tspans) {
+    if (!r.current) {
+      r.current = ref.current.append("tspan");
+    }
+  }
   ref.current
     .attr("pointer-events", "none")
     .attr("text-anchor", "middle")
     .attr("stroke", "none")
     // .attr("stroke-width", "1")
     .attr("fill", "#fff")
-    .text(d => d.label)
     .attr("x", d => d.x + d.width / 2)
     .attr("y", d => d.y + d.height / 2)
     .attr("width", d => d.width);
+
+  for (let idx = 0; idx < tspans.length; idx++) {
+    const r = tspans[idx];
+    const template = labelTemplates[idx];
+    r.current
+      .text(typeof template === "function" ? template : d => d.label)
+      .attr("text-anchor", "center")
+      .attr("x", d => d.x + d.width / 2)
+      .attr("dy", idx ? 16 : 0);
+  }
 }
 
 export function addMouseHandlers({
