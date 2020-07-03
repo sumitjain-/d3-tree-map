@@ -45,21 +45,22 @@ export function populateRectDimensions({
 }
 
 export function drawRects({ svg, ref, dataArray, colorScale }) {
-  if (!ref.current) {
-    const selection = svg
-      .selectAll("rect")
-      .data(dataArray)
-      .enter()
-      .append("rect");
-    ref.current = selection;
-  }
+  const selection = svg.selectAll("rect").data(dataArray, d => d.label);
+  selection.exit().remove();
+
+  ref.current = selection;
+
+  ref.current.enter().insert("rect", "text");
+
   ref.current
+    .attr("fill", d => colorScale(d.value))
     .attr("stroke", "#fff")
+    .transition()
+    .duration(350)
     .attr("x", d => d.x)
     .attr("y", d => d.y)
     .attr("width", d => d.width)
-    .attr("height", d => d.height)
-    .attr("fill", d => colorScale(d.value));
+    .attr("height", d => d.height);
 }
 
 export function drawTexts({
@@ -71,27 +72,27 @@ export function drawTexts({
   labelTemplate,
   subLabelTemplate
 }) {
-  if (!ref.current) {
-    ref.current = svg
-      .selectAll("text")
-      .data(dataArray)
-      .enter()
-      .append("text");
-  }
-  if (!labelTspanRef.current) {
-    labelTspanRef.current = ref.current.append("tspan");
-  }
+  const selection = svg.selectAll("text").data(dataArray, d => d.label);
 
-  if (subLabelTemplate && !subLabelTspanRef.current) {
-    subLabelTspanRef.current = ref.current.append("tspan");
-  }
+  selection.exit().remove();
+
+  ref.current = selection;
+
+  ref.current.enter().append("text");
+
+  ref.current.selectAll("tspan").remove();
+
+  labelTspanRef.current = ref.current.append("tspan");
+  labelTspanRef.current.classed("label", true);
 
   ref.current
     .attr("pointer-events", "none")
     .attr("text-anchor", "middle")
     .attr("stroke", "none")
-    // .attr("stroke-width", "1")
+    .attr("font-size", "1.25em")
     .attr("fill", "#fff")
+    .transition()
+    .duration(350)
     .attr("x", d => d.x + d.width / 2)
     .attr("y", d => d.y + d.height / 2)
     .attr("width", d => d.width);
@@ -101,11 +102,20 @@ export function drawTexts({
   );
 
   if (typeof subLabelTemplate === "function") {
+    subLabelTspanRef.current = ref.current.append("tspan");
+    subLabelTspanRef.current.classed("sub-label", true);
+
     subLabelTspanRef.current
       .text(subLabelTemplate)
-      .attr("text-anchor", "center")
+      .attr("pointer-events", "none")
+      .attr("text-anchor", "middle")
+      .attr("stroke", "none")
+      .attr("font-size", "1.25em")
+      .attr("fill", "#fff")
+      .transition()
+      .duration(350)
       .attr("x", d => d.x + d.width / 2)
-      .attr("dy", 16);
+      .attr("dy", "1.25em");
   }
 }
 

@@ -1,13 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import { Treemap } from "./treemap";
 import data from "./data";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export function Container() {
+  const [selectedRegion, setSelectedRegion] = useState(null);
   return (
     <div>
-      <h2>Custom Label Template</h2>
+      <h2>Handle data updates</h2>
+      <Treemap
+        // chartWidth={400}
+        chartHeight={400}
+        data={selectedRegion || data}
+        labelTemplate={function(d) {
+          return `Block: ${d.label}`;
+        }}
+        subLabelTemplate={function(d) {
+          return `Rs.${d.value}`;
+        }}
+        onRegionClick={function(d) {
+          setSelectedRegion([d]);
+        }}
+      />
+      <button
+        onClick={() => {
+          setSelectedRegion(null);
+        }}
+        className="btn btn-primary"
+      >
+        Reset
+      </button>
+      <br />
+      <br />
+      {/* <h2>Custom Label Template</h2>
       <Treemap
         // chartWidth={400}
         chartHeight={400}
@@ -41,7 +67,7 @@ export function Container() {
         data={data}
       />
       <h2>Custom Split Direction</h2>
-      <Treemap chartHeight={400} data={data} splitVertical={true} />
+      <Treemap chartHeight={400} data={data} splitVertical={true} /> */}
     </div>
   );
 }

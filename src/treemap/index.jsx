@@ -31,13 +31,10 @@ export function Treemap(props) {
 
   const textsRef = useRef(null);
 
-  const d3colorRange = colorRange.map(x => d3.rgb(x));
-
-  const paletteScale = d3
-    .scaleLinear()
-    .interpolate(d3.interpolateHcl)
+  const paletteScale = d3.scale
+    .linear()
     .domain(d3.extent(data, d => d.value))
-    .range(d3colorRange);
+    .range(colorRange);
 
   function resizeHandler() {
     const rect = containerRef.current.getBoundingClientRect();
@@ -114,8 +111,6 @@ export function Treemap(props) {
     onMouseLeave,
     onRegionClick,
     splitVertical,
-    labelTspanRef,
-    subLabelTspanRef,
     labelTemplate,
     subLabelTemplate
   ]);
