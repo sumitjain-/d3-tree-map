@@ -17,7 +17,10 @@ export function Treemap(props) {
     colorRange = ["#fde2ce", "#f7a05f"],
     splitVertical,
     labelTemplate,
-    subLabelTemplate
+    subLabelTemplate,
+    onMouseEnter,
+    onMouseLeave,
+    onRegionClick
   } = props;
   const [chartWidth, setChartWidth] = useState(cw);
   const containerRef = useRef(null);
@@ -93,8 +96,9 @@ export function Treemap(props) {
       rects: rectsRef.current,
       colorRange,
       colorScale: paletteScale,
-      mouseEnterHandler: props.onMouseEnter,
-      mouseLeaveHandler: props.onMouseLeave
+      onMouseEnter,
+      onMouseLeave,
+      onRegionClick
     });
 
     return () => {
@@ -106,8 +110,9 @@ export function Treemap(props) {
     colorRange,
     data,
     paletteScale,
-    props.onMouseEnter,
-    props.onMouseLeave,
+    onMouseEnter,
+    onMouseLeave,
+    onRegionClick,
     splitVertical,
     labelTspanRef,
     subLabelTspanRef,
